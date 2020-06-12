@@ -37,7 +37,9 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
 @import "colors";
 
 #calculator {
-  @import "highcharts";
+  // @import "highcharts";
+
+  box-sizing: border-box;
 
   max-width: 580px;
   margin-bottom: 25px;
@@ -49,12 +51,6 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   background-position: left 75px;
   background-repeat: no-repeat;
   background-size: 620px;
-  @include x-small-only {
-    background-position: left 110px;
-  }
-  @include x-x-small {
-    background-position: left 145px;
-  }
 
   .flex-container {
     display: flex;
@@ -101,7 +97,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
       color: $green-primary;
       font-weight: 600;
       padding: 5px 5px 5px 10px;
-      width: 180px;
+      width: 170px;
       @include x-small {
         width: 215px;
       }
@@ -111,7 +107,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
         content: '$';
         position: relative;
         top: -2px;
-        left: -190px;
+        left: -180px;
         height: 20px;
         width: 10px;
         z-index: 999;
@@ -121,10 +117,10 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
         }
       }
       & input {
-        padding-left: 25px;
-        width: 170px;
+        padding-left: 20px;
+        width: 160px;
         @include x-small {
-          width: 200px;
+          width: 205px;
         }
       }
     }
@@ -133,7 +129,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
         content: '%';
         position: relative;
         top: -2px;
-        left: -35px;
+        left: -40px;
         height: 20px;
         width: 10px;
         z-index: 999;
@@ -184,39 +180,60 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   .results {
     flex-grow: 1;
     background-color: white;
-    padding: 10px 0;
+    padding: 10px;
     margin-top: 5px;
     height: 80%;
+    min-height: 325px;
+    max-width: 300px;
     @include x-x-small {
       max-width: 250px;
     }
     @include x-small-only {
       max-width: 320px;
     }
+    @include sm-md-xl() {
+      margin-left: -20px;
+    }
   }
 
-  p.label-text {
+  .label-text {
     margin-block-start: 0;
     margin-block-end: 0;
     font-weight: 600;
     font-size: 16px;
     margin-left: 10px;
-    @include sm-md-xl {
-      text-align: center;
-      margin-left: 0px;
-    }
   }
 
   .value-text  {
-    font-size: 36px;
-    line-height: 34px;
     font-weight: 700;
     color: $green-primary;
-    margin-top: 5px;
-    margin-left: 10px;
-    @include sm-md-xl {
-      text-align: center;
-      margin-left: 0px;
+    padding-left: 5px;
+    text-align: right;
+    @include x-x-small {
+      padding-left: 0px;
+    }
+  }
+
+  table {
+    width: 295px;
+    @include x-x-small() {
+      width: 240px;
+    }
+    margin: 0 auto;
+    & td {
+      // border-bottom: 1px solid $slate-secondary-4;
+      padding: 5px 0px 2px;
+    }
+  }
+
+  .alt-payments {
+    margin: 10px auto 0;
+    border-top: 1px solid $green-secondary-5;
+    max-width: 280px;
+    padding: 0 5px;
+    font-size: 14px;
+    & .value-text {
+      padding: 0;
     }
   }
 
