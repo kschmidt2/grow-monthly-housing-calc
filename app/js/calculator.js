@@ -37,21 +37,17 @@ var calculator = new Vue({
             fullPayoffDate,
             month,
             year,
+            monthlyData = [],
+            annualData = [],
+            catArray = [],
+            loanTotal = A,
+            containerWidth,
             N10,
             N25,
             I10,
             I25,
-            PMT,
-            fvOfPrincipal = A,
-            fvOfContributions = 0,
-            totalPrincipal,
-            totalInterest,
-            combined,
-            iData = [],
-            rData = [],
             categories,
-            catArray = [],
-            tickInterval = 5.
+            tickInterval = 2.
             year = new Date().getFullYear();
 
         
@@ -64,7 +60,6 @@ var calculator = new Vue({
         DNumerator = (Math.pow((1+r),n))-1;
         DDenominator = r*(Math.pow((1+r), n));
         D = DNumerator/DDenominator;
-        console.log(D);
 
         this.monthlyPayment = A/D;
 
@@ -86,14 +81,69 @@ var calculator = new Vue({
 
         this.payoffDate = month + " " + year;
 
+        // get data for chart
+        monthlyData.push(A); // adds starting loan amount to the data array
+
+        for (i=0; i<n; i++) {
+            loanTotal = loanTotal * r + loanTotal - this.monthlyPayment; // monthly loan total calculated as principal plus interest, minus the payment
+            monthlyData.push(loanTotal); 
+            annualData = monthlyData.filter((_,i) => i % 12 == 0); // takes every 12th data point
+            annualData.pop(); // removes last data point and replaces it with 0
+            annualData.push(0);
+        }
+        console.log(annualData)
+
+        currentDate = new Date();
+
+        for (i=0; i<annualData.length; i++) {
+            year = currentDate.getFullYear();
+            month = currentDate.getMonth() + 1;
+            catYear = i + year; // gets the array of years for the loan
+
+            categories = catYear.toString().substr(-2); // converts years to two digits
+            categories = month + '/' + categories; // adds month to year
+            catArray.push(categories);
+        }
+        
+        console.log(catArray);
+
+        containerWidth = document.getElementById('calculator').offsetWidth;
+
+        if (containerWidth < 400) {
+            setTickIntervalMobile();
+        } else {
+            setTickIntervalDesktop();
+        }
+
+        function setTickIntervalMobile() {
+            if (annualData.length > 22) {
+                tickInterval = 10;
+            } else if (annualData.length >= 14 && annualData.length < 22) {
+                tickInterval = 5;
+            } else if (annualData.length < 7) {
+                tickInterval = 1;
+            }
+        }
+
+        function setTickIntervalDesktop() {
+            if (annualData.length < 12) {
+                tickInterval = 1;
+            } else if (annualData.length > 21) {
+                tickInterval = 5;
+            }
+        }
+
+        
+
+        this.drawChart(annualData,catArray,tickInterval);
+
+
         // add 10% to your payment
         this.tenPayment = this.monthlyPayment*1.1;
 
         N10 = (Math.log(1-r*A/this.tenPayment)*-1)/Math.log(1+r);
 
         currentDate = new Date();
-
-        console.log(currentDate);
 
         fullPayoffDate10 = new Date(currentDate.setMonth(currentDate.getMonth()+N10+1));
 
@@ -113,23 +163,16 @@ var calculator = new Vue({
 
         currentDate = new Date();
 
-        console.log(currentDate);
-
         fullPayoffDate25 = new Date(currentDate.setMonth(currentDate.getMonth()+N25+1));
 
         month = monthNames[fullPayoffDate25.getMonth()];
         year = fullPayoffDate25.getFullYear();
-
-        console.log(N25);
-        console.log(fullPayoffDate25);
 
         this.twentyfivePayoff = month + " " + year;
 
         I25 = this.twentyfivePayment*N25 - A;
 
         this.twentyfiveSave = this.totalInterest - I25;
-
-        console.log(I25);
 
 
         this.monthlyPayment = this.monthlyPayment.toLocaleString(undefined,
@@ -154,145 +197,83 @@ var calculator = new Vue({
             {'minimumFractionDigits':2,'maximumFractionDigits':2});
 
 
-
-        // for (i=0; i<(n/12); i++) {
-        //     fvOfPrincipal = fvOfPrincipal*(1+r/n);
-        //     fvOfContributions = (fvOfContributions+PMT)*(1+r/n);
-        //     combined = fvOfPrincipal + fvOfContributions;
-        //     totalInvestment = PMT*(i+1) + A;
-        //     totalReturn = Math.round(combined - totalInvestment);
-        //     iData.push(totalInvestment);
-        //     rData.push(totalReturn);
-
-        //     categories = i + 1 + (year-2000);
-        //     categories.toString();
-        //     categories = "'" + categories;
-        //     catArray.push(categories)
-        // }
-
-        // iData.unshift(A);
-        // rData.unshift(0);
-        // catArray.unshift(year);
-
-        // if (n==12) {  
-        //     iData = iData.filter((element, index) => {
-        //         return index % 12 === 0;
-        //     })
-        //     rData = rData.filter((element, index) => {
-        //         return index % 12 === 0;
-        //     })
-        // }
-
-        // if (iData.length > 21) {
-        //     tickInterval = 10;
-        // } else if (iData.length < 6) {
-        //     tickInterval = 1;
-        // }
-
-        // this.drawChart(iData,rData,catArray,tickInterval);
-
-        // this.monthlyPayment = fvOfPrincipal + fvOfContributions;
-
-        // totalReturn = this.monthlyPayment - totalContributions;
-
-        // if (this.monthlyPayment > 999999999) {
-        //     const suffixes = ["", " billion"," trillion"];
-        //     let suffixNum = 0;
-        //     this.monthlyPayment /= 999999999;
-        //     suffixNum++;
-        
-        //     this.monthlyPayment = this.monthlyPayment.toPrecision(3);
-        
-        //     this.monthlyPayment += suffixes[suffixNum];
-        // }
-
-
-
       },
-    //   drawChart: function(iData,rData,catArray,tickInterval) {
+      drawChart: function(annualData,catArray,tickInterval) {
 
-    //     Highcharts.setOptions({
-    //         lang: {
-    //           thousandsSep: ',',
-    //           numericSymbols: [null, "M", "G", "T", "P", "E"]
-    //         }
-    //     });
+        Highcharts.setOptions({
+            lang: {
+              thousandsSep: ',',
+              numericSymbols: [null, "M", "G", "T", "P", "E"]
+            }
+        });
 
-    //     function drawHighcharts() {
-    //         Highcharts.chart('chart-container-CIcalc', {
-    //             chart: {
-    //                 type: 'column',
-    //                 styledMode: true,
-    //                 spacingBottom: 0,
-    //                 spacingRight: 20,
-    //                 spacingLeft: 20,
-    //                 animation: false
-    //             }, 
-    //             title: {
-    //                 text: null
-    //             },
-    //             series: [{
-    //                 name: 'Return',
-    //                 data: rData
-    //             }, {
-    //                 name: 'Investment',
-    //                 data: iData
-    //             }],
-    //             // for line charts only
-    //             plotOptions: {
-    //                 column: {
-    //                     stacking: 'normal'
-    //                 },
-    //                 series: {
-    //                     groupPadding: 0.1
-    //                 }
-    //             },
-    //             legend: {
-    //                 align: 'left',
-    //                 symbolRadius: 0,
-    //                 verticalAlign: 'top',
-    //                 x: -18,
-    //                 itemMarginTop: -10,
-    //             },
-    //             xAxis: {
-    //                 labels: {
-    //                     style: {
-    //                         whiteSpace: 'nowrap',
-    //                     },
-    //                 },
-    //                 categories: catArray,
-    //                 tickLength: 5,
-    //                 tickInterval: tickInterval
-    //             },
-    //             yAxis: {
-    //                 title: false,
-    //                 labels: {
-    //                     overflow: 'allow',
-    //                     formatter: function () {
-    //                         return '$' + Highcharts.numberFormat(this.value,0,'.',',');
-    //                     },
-    //                 },
-    //                 tickAmount: 5,
-    //             },
-    //             credits: {
-    //                 enabled: false
-    //             },
-    //             tooltip: {
-    //                 shadow: false,
-    //                 padding: 10,
-    //                 shared: true,
-    //                 valuePrefix: '$'
-    //             },
-    //         })
-    //     }
+        function drawHighcharts() {
+            Highcharts.chart('chart-container-loancalc', {
+                chart: {
+                    type: 'column',
+                    styledMode: true,
+                    spacingBottom: 0,
+                    spacingRight: 20,
+                    spacingLeft: 0,
+                    animation: false
+                }, 
+                title: {
+                    text: null
+                },
+                series: [{
+                    name: 'Loan balance',
+                    data: annualData
+                }],
+                // for line charts only
+                plotOptions: {
+                    series: {
+                        groupPadding: 0.1
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                xAxis: {
+                    labels: {
+                        style: {
+                            textOverflow: 'none'
+                        },
+                        autoRotation: 0,
+                    },
+                    categories: catArray,
+                    tickLength: 5,
+                    tickInterval: tickInterval
+                },
+                yAxis: {
+                    title: false,
+                    labels: {
+                        overflow: 'allow',
+                        formatter: function () {
+                            return '$' + Highcharts.numberFormat(this.value,0,'.',',');
+                        },
+                    },
+                    tickAmount: 5,
+                },
+                credits: {
+                    enabled: false
+                },
+                tooltip: {
+                    shadow: false,
+                    padding: 10,
+                    shared: true,
+                    valuePrefix: '$',
+                    valueDecimals: 2
+                },
+            })
+        }
         
-    //     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    //         drawHighcharts();
-    //     } else {
-    //         document.addEventListener("DOMContentLoaded", drawHighcharts);
-    //     }
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            drawHighcharts();
+        } else {
+            document.addEventListener("DOMContentLoaded", drawHighcharts);
+        }
 
-    //   }
+      }
     },
     mounted: function(){
         this.getResults()
