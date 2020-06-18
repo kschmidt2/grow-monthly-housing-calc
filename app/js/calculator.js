@@ -9,6 +9,7 @@ var calculator = new Vue({
       totalInterest: '',
       monthlyPayment: '',
       payoffDate: '',
+      headerString: '',
       tenPayment: '',
       tenSave: '',
       tenPayoff: '',
@@ -37,6 +38,8 @@ var calculator = new Vue({
             fullPayoffDate,
             month,
             year,
+            catYear,
+            monthName,
             monthlyData = [],
             annualData = [],
             catArray = [],
@@ -76,10 +79,10 @@ var calculator = new Vue({
 
         fullPayoffDate = new Date(currentDate.setMonth(currentDate.getMonth()+n));
 
-        month = monthNames[fullPayoffDate.getMonth()];
+        this.payoffMonth = monthNames[fullPayoffDate.getMonth()];
         year = fullPayoffDate.getFullYear();
 
-        this.payoffDate = month + " " + year;
+        this.payoffDate = this.payoffMonth + " " + year;
 
         // get data for chart
         monthlyData.push(A); // adds starting loan amount to the data array
@@ -87,25 +90,65 @@ var calculator = new Vue({
         for (i=0; i<n; i++) {
             loanTotal = loanTotal * r + loanTotal - this.monthlyPayment; // monthly loan total calculated as principal plus interest, minus the payment
             monthlyData.push(loanTotal); 
-            annualData = monthlyData.filter((_,i) => i % 12 == 0); // takes every 12th data point
-            annualData.pop(); // removes last data point and replaces it with 0
-            annualData.push(0);
+            
+            if (n>24) {
+                annualData = monthlyData.filter((_,i) => i % 12 == 0); // takes every 12th data point
+
+            } else {
+                annualData = monthlyData;
+            }
+            
         }
-        console.log(annualData)
+
+        annualData.pop(); // removes last data point and replaces it with 0
+        annualData.push(0);
 
         currentDate = new Date();
 
         for (i=0; i<annualData.length; i++) {
             year = currentDate.getFullYear();
-            month = currentDate.getMonth() + 1;
-            catYear = i + year; // gets the array of years for the loan
+            month = currentDate.getMonth();
+            monthName = monthNames[month];
+            catYear = year;
 
-            categories = catYear.toString().substr(-2); // converts years to two digits
-            categories = month + '/' + categories; // adds month to year
-            catArray.push(categories);
+            if (monthName == 'January' || monthName == 'February' || monthName == 'March' || monthName == 'April' || monthName == 'August' || monthName == 'September' || monthName == 'October' || monthName == 'November' || monthName == 'December') {
+                monthName = monthName.substring(0,3) + '.';
+            }
+
+            if (n>24) {
+                catYear = i + year; // gets the array of years for the loan
+                categories = catYear.toString().substr(-2); // converts years to two digits
+                categories = ' \'' + categories; // adds month to year
+                catArray.push(categories);
+            } else {
+                categories = i + month;
+                if (categories > 11 && categories <= 23) {
+                    categories= categories - 12;
+                    catYear = year + 1;
+                } else if (categories > 23) {
+                    categories= categories - 24;
+                    catYear = year + 2;
+                }
+
+                
+
+                monthName = monthNames[categories];
+                if (monthName == 'January' || monthName == 'February' || monthName == 'March' || monthName == 'April' || monthName == 'August' || monthName == 'September' || monthName == 'October' || monthName == 'November' || monthName == 'December') {
+                    monthName = monthName.substring(0,3) + '.';
+                }
+
+                categories = monthName + ' \'' + catYear.toString().substr(-2);;
+                catArray.push(categories);
+            }
+
+            
         }
         
-        console.log(catArray);
+        if (n>24) {
+            this.headerString = "Loan balance in " + monthName + " of each year"
+        } else {
+            this.headerString = "Monthly loan balance"
+        }
 
         containerWidth = document.getElementById('calculator').offsetWidth;
 
@@ -116,9 +159,9 @@ var calculator = new Vue({
         }
 
         function setTickIntervalMobile() {
-            if (annualData.length > 22) {
+            if (annualData.length >= 22) {
                 tickInterval = 10;
-            } else if (annualData.length >= 14 && annualData.length < 22) {
+            } else if (annualData.length >= 12 && annualData.length < 22) {
                 tickInterval = 5;
             } else if (annualData.length < 7) {
                 tickInterval = 1;
@@ -128,7 +171,7 @@ var calculator = new Vue({
         function setTickIntervalDesktop() {
             if (annualData.length < 12) {
                 tickInterval = 1;
-            } else if (annualData.length > 21) {
+            } else if (annualData.length > 17) {
                 tickInterval = 5;
             }
         }
@@ -213,7 +256,7 @@ var calculator = new Vue({
                     type: 'column',
                     styledMode: true,
                     spacingBottom: 0,
-                    spacingRight: 20,
+                    spacingRight: 0,
                     spacingLeft: 0,
                     animation: false
                 }, 

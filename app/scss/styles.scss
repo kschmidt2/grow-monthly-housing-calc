@@ -51,6 +51,9 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   background-position: left 75px;
   background-repeat: no-repeat;
   background-size: 620px;
+  @include sm-md-xl(){
+    padding: 20px 30px;
+  }
 
   .flex-container {
     display: flex;
@@ -76,11 +79,17 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
 
   .input-area {
     width: 100%;
-    max-width: 240px;
+    // max-width: 240px;
     // flex-shrink: 0;
     @include x-small {
       max-width: 350px;
     }
+  }
+
+  .wrap {
+    @include sm-md-xl() {
+      float: left;
+    }  
   }
 
   .calc-input {
@@ -97,7 +106,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
       color: $green-primary;
       font-weight: 600;
       padding: 5px 5px 5px 10px;
-      width: 170px;
+      width: 140px;
       @include x-small {
         width: 215px;
       }
@@ -107,7 +116,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
         content: '$';
         position: relative;
         top: -2px;
-        left: -180px;
+        left: -150px;
         height: 20px;
         width: 10px;
         z-index: 999;
@@ -118,7 +127,8 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
       }
       & input {
         padding-left: 20px;
-        width: 160px;
+        width: 130px;
+        margin-right: 5px;
         @include x-small {
           width: 205px;
         }
@@ -141,10 +151,11 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   .calc-input-radio {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: -20px;
     margin-top: -15px;
     @include x-small {
       margin-top: -15px;
+      margin-bottom: 20px;
     }
     & input {
       position: absolute !important;
@@ -182,9 +193,10 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
     background-color: white;
     padding: 10px;
     margin-top: 5px;
+    margin-bottom: 20px;
     height: 80%;
     min-height: 325px;
-    max-width: 300px;
+    // max-width: 300px;
     @include x-x-small {
       max-width: 250px;
     }
@@ -192,7 +204,8 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
       max-width: 320px;
     }
     @include sm-md-xl() {
-      margin-left: -20px;
+      // margin-left: -20px;
+      padding: 20px 20px 10px;
     }
   }
 
@@ -215,7 +228,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   }
 
   table {
-    width: 295px;
+    width: 100%;
     @include x-x-small() {
       width: 240px;
     }
@@ -229,7 +242,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   .alt-payments {
     margin: 10px auto 0;
     border-top: 1px solid $green-secondary-5;
-    max-width: 290px;
+    // max-width: 290px;
     padding: 0 5px;
     font-size: 14px;
     & .value-text {
@@ -241,13 +254,10 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
     font-weight: 600;
     font-size: 16px;
     background: white;
-    padding: 15px;
+    // padding: 15px;
     margin-top: 25px;
-    margin-bottom: -10px;
+    margin-bottom: 10px;
     width: 100%;
-    @include x-small {
-      margin-top: -15px;
-    }
     @include x-x-small {
       max-width: 240px;
     }
@@ -260,7 +270,6 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
     width: 100%;
     height: 250px;
     background: white;
-    padding: 15px;
     margin-bottom: 20px;
     @include x-small {
       height: 200px;
@@ -291,6 +300,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
 
   button {
     margin-bottom: 15px;
+    margin-top: 10px;
     color: white;
     font-size: 16px;
     line-height: 1;
