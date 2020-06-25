@@ -95,7 +95,7 @@ var calculator = new Vue({
                 annualData = monthlyData.filter((_,i) => i % 12 == 0); // takes every 12th data point
 
             } else {
-                annualData = monthlyData;
+                annualData = monthlyData; // if the loan period is 2 years or less, pushes monthly data to chart
             }
             
         }
@@ -111,10 +111,12 @@ var calculator = new Vue({
             monthName = monthNames[month];
             catYear = year;
 
+            // shortens long month names
             if (monthName == 'January' || monthName == 'February' || monthName == 'March' || monthName == 'April' || monthName == 'August' || monthName == 'September' || monthName == 'October' || monthName == 'November' || monthName == 'December') {
                 monthName = monthName.substring(0,3) + '.';
             }
 
+            //  pulls category years for annual charts
             if (n>24) {
                 catYear = i + year; // gets the array of years for the loan
                 categories = catYear.toString().substr(-2); // converts years to two digits
@@ -143,7 +145,9 @@ var calculator = new Vue({
 
             
         }
-        
+
+
+        // get title name for chart
         if (n>24) {
             this.headerString = "Loan balance in " + monthName + " of each year"
         } else {
