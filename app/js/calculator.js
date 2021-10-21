@@ -1,326 +1,83 @@
 var calculator = new Vue({
     el: '#calculator',
     data: {
-      amount: '10,000',
-      frequency:1,
-      term: 7,
-      interestRate: 3,
-      totalPaid: '',
-      totalInterest: '',
-      monthlyPayment: '',
-      payoffDate: '',
-      headerString: '',
-      tenPayment: '',
-      tenSave: '',
-      tenPayoff: '',
-      twentyfivePayment: '',
-      twentyfiveSave: '',
-      twentyfivePayoff: '',
+      income: '60,000',
+      rentbuy:'rent',
+      debt: '500',
+      monthly25:0,
+      monthly30:0,
+      monthly28:0,
+      monthly36:0,
+      canPay:0,
+      showRentbuy: 'rent',
+      exceedMax: true,
+      isDisabled: true,
 
     },
     watch: {
-        amount: function(newValue) {
+        income: function(newValue) {
             const result = newValue.replace(/\D/g, "")
               .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            Vue.nextTick(() => this.amount = result);
+            Vue.nextTick(() => this.income = result);
+          },
+          debt: function(newValue) {
+            const result = newValue.replace(/\D/g, "")
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            Vue.nextTick(() => this.debt = result);
           },
     },
     methods: {
       // functions go here
       getResults: function () {
-        let A = parseInt((this.amount.replace(/,/g, '')),10),
-            r = (this.interestRate/100)/12,
-            n = this.term,
-            DNumerator,
-            DDenominator,
-            D,
-            currentDate,
-            fullPayoffDate,
-            month,
-            year,
-            catYear,
-            monthName,
-            monthlyData = [],
-            annualData = [],
-            catArray = [],
-            loanTotal = A,
-            containerWidth,
-            N10,
-            N25,
-            I10,
-            I25,
-            categories,
-            tickInterval = 2.
-            year = new Date().getFullYear();
+        let income = parseInt((this.income.replace(/,/g, '')),10),
+            debt = parseInt((this.debt.replace(/,/g, '')),10),
+            monthlyIncome = income/12,
+            totalDebt25,
+            totalDebt28;
+
+
+        if (this.rentbuy == 'rent') {
+            this.showRentbuy = 'rent';
+        } else if (this.rentbuy == 'buy') {
+            this.showRentbuy = 'buy';
+        }
+
+        this.monthly25 = monthlyIncome*.25;
+        this.monthly28 = monthlyIncome*.28;
+        this.monthly30 = monthlyIncome*.30;
+        this.monthly36 = monthlyIncome*.36;
+
+        console.log(debt+this.monthly28)
+        console.log(debt+this.monthly36)
+
+        if ((debt + this.monthly28) > this.monthly36) {
+            this.canPay = this.monthly36 - debt;
+            this.exceedMax = true;
+        } else if ((debt + this.monthly28) <= this.monthly36) {
+            this.canPay = this.monthly28;
+            this.exceedMax = false;
+        }
+
+        console.log(this.canPay);
 
         
-        // converts the term into months
-        if (this.frequency == 1) {
-            n = n*12;
-        }
-
-        // amortized loan calculations
-        DNumerator = (Math.pow((1+r),n))-1;
-        DDenominator = r*(Math.pow((1+r), n));
-        D = DNumerator/DDenominator;
-
-        this.monthlyPayment = A/D;
-
-        this.totalPaid = this.monthlyPayment*n;
-
-        this.totalInterest = this.totalPaid - A;
-
-        // get current date and payoff date
-        const monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-            ];
-
-        currentDate = new Date();
-
-        fullPayoffDate = new Date(currentDate.setMonth(currentDate.getMonth()+n));
-
-        this.payoffMonth = monthNames[fullPayoffDate.getMonth()];
-        year = fullPayoffDate.getFullYear();
-
-        this.payoffDate = this.payoffMonth + " " + year;
-
-        // get data for chart
-        monthlyData.push(A); // adds starting loan amount to the data array
-
-        for (i=0; i<n; i++) {
-            loanTotal = loanTotal * r + loanTotal - this.monthlyPayment; // monthly loan total calculated as principal plus interest, minus the payment
-            monthlyData.push(loanTotal); 
-            
-            if (n>24) {
-                annualData = monthlyData.filter((_,i) => i % 12 == 0); // takes every 12th data point
-
-            } else {
-                annualData = monthlyData; // if the loan period is 2 years or less, pushes monthly data to chart
-            }
-            
-        }
-
-        annualData.pop(); // removes last data point and replaces it with 0
-        annualData.push(0);
-
-        currentDate = new Date();
-
-        for (i=0; i<annualData.length; i++) {
-            year = currentDate.getFullYear();
-            month = currentDate.getMonth();
-            monthName = monthNames[month];
-            catYear = year;
-
-            // shortens long month names
-            if (monthName == 'January' || monthName == 'February' || monthName == 'March' || monthName == 'April' || monthName == 'August' || monthName == 'September' || monthName == 'October' || monthName == 'November' || monthName == 'December') {
-                monthName = monthName.substring(0,3) + '.';
-            }
-
-            //  pulls category years for annual charts
-            if (n>24) {
-                catYear = i + year; // gets the array of years for the loan
-                categories = catYear.toString().substr(-2); // converts years to two digits
-                categories = ' \'' + categories; // adds month to year
-                catArray.push(categories);
-            } else {
-                categories = i + month;
-                if (categories > 11 && categories <= 23) {
-                    categories= categories - 12;
-                    catYear = year + 1;
-                } else if (categories > 23) {
-                    categories= categories - 24;
-                    catYear = year + 2;
-                }
-
-                
-
-                monthName = monthNames[categories];
-                if (monthName == 'January' || monthName == 'February' || monthName == 'March' || monthName == 'April' || monthName == 'August' || monthName == 'September' || monthName == 'October' || monthName == 'November' || monthName == 'December') {
-                    monthName = monthName.substring(0,3) + '.';
-                }
-
-                categories = monthName + ' \'' + catYear.toString().substr(-2);;
-                catArray.push(categories);
-            }
-
-            
-        }
+      
 
 
-        // get title name for chart
-        if (n>24) {
-            this.headerString = "Loan balance in " + monthName + " of each year"
-        } else {
-            this.headerString = "Monthly loan balance"
-        }
+        this.canPay = this.canPay.toLocaleString(undefined,
+            {'minimumFractionDigits':0,'maximumFractionDigits':0});
+        this.monthly25 = this.monthly25.toLocaleString(undefined,
+            {'minimumFractionDigits':0,'maximumFractionDigits':0});
+        this.monthly30 = this.monthly30.toLocaleString(undefined,
+            {'minimumFractionDigits':0,'maximumFractionDigits':0});
+        this.monthly28 = this.monthly28.toLocaleString(undefined,
+            {'minimumFractionDigits':0,'maximumFractionDigits':0});
 
-        containerWidth = document.getElementById('calculator').offsetWidth;
-
-        if (containerWidth < 400) {
-            setTickIntervalMobile();
-        } else {
-            setTickIntervalDesktop();
-        }
-
-        function setTickIntervalMobile() {
-            if (annualData.length >= 22) {
-                tickInterval = 10;
-            } else if (annualData.length >= 12 && annualData.length < 22) {
-                tickInterval = 5;
-            } else if (annualData.length < 7) {
-                tickInterval = 1;
-            }
-        }
-
-        function setTickIntervalDesktop() {
-            if (annualData.length < 12) {
-                tickInterval = 1;
-            } else if (annualData.length > 17) {
-                tickInterval = 5;
-            }
-        }
-
-        
-
-        this.drawChart(annualData,catArray,tickInterval);
-
-
-        // add 10% to your payment
-        this.tenPayment = this.monthlyPayment*1.1;
-
-        N10 = (Math.log(1-r*A/this.tenPayment)*-1)/Math.log(1+r);
-
-        currentDate = new Date();
-
-        fullPayoffDate10 = new Date(currentDate.setMonth(currentDate.getMonth()+N10+1));
-
-        month = monthNames[fullPayoffDate10.getMonth()];
-        year = fullPayoffDate10.getFullYear();
-
-        this.tenPayoff = month + " " + year;
-
-        I10 = this.tenPayment*N10 - A;
-
-        this.tenSave = this.totalInterest - I10;
-
-
-        // add 25% to your payment
-        this.twentyfivePayment = this.monthlyPayment*1.25;
-        N25 = (Math.log(1-r*A/this.twentyfivePayment)*-1)/Math.log(1+r);
-
-        currentDate = new Date();
-
-        fullPayoffDate25 = new Date(currentDate.setMonth(currentDate.getMonth()+N25+1));
-
-        month = monthNames[fullPayoffDate25.getMonth()];
-        year = fullPayoffDate25.getFullYear();
-
-        this.twentyfivePayoff = month + " " + year;
-
-        I25 = this.twentyfivePayment*N25 - A;
-
-        this.twentyfiveSave = this.totalInterest - I25;
-
-
-        this.monthlyPayment = this.monthlyPayment.toLocaleString(undefined,
-            {'minimumFractionDigits':2,'maximumFractionDigits':2});
-
-        this.totalPaid = this.totalPaid.toLocaleString(undefined,
-            {'minimumFractionDigits':2,'maximumFractionDigits':2});
-
-        this.totalInterest = this.totalInterest.toLocaleString(undefined,
-            {'minimumFractionDigits':2,'maximumFractionDigits':2});
-
-        this.tenPayment = this.tenPayment.toLocaleString(undefined,
-            {'minimumFractionDigits':2,'maximumFractionDigits':2});
-
-        this.tenSave = this.tenSave.toLocaleString(undefined,
-            {'minimumFractionDigits':2,'maximumFractionDigits':2});
-
-        this.twentyfivePayment = this.twentyfivePayment.toLocaleString(undefined,
-            {'minimumFractionDigits':2,'maximumFractionDigits':2});
-
-        this.twentyfiveSave = this.twentyfiveSave.toLocaleString(undefined,
-            {'minimumFractionDigits':2,'maximumFractionDigits':2});
+     
 
 
       },
-      drawChart: function(annualData,catArray,tickInterval) {
-
-        Highcharts.setOptions({
-            lang: {
-              thousandsSep: ',',
-              numericSymbols: [null, "M", "G", "T", "P", "E"]
-            }
-        });
-
-        function drawHighcharts() {
-            Highcharts.chart('chart-container-loancalc', {
-                chart: {
-                    type: 'column',
-                    styledMode: true,
-                    spacingBottom: 0,
-                    spacingRight: 0,
-                    spacingLeft: 0,
-                    animation: false
-                }, 
-                title: {
-                    text: null
-                },
-                series: [{
-                    name: 'Loan balance',
-                    data: annualData
-                }],
-                // for line charts only
-                plotOptions: {
-                    series: {
-                        groupPadding: 0.1
-                    }
-                },
-                legend: {
-                    enabled: false
-                },
-                xAxis: {
-                    labels: {
-                        style: {
-                            textOverflow: 'none'
-                        },
-                        autoRotation: 0,
-                    },
-                    categories: catArray,
-                    tickLength: 5,
-                    tickInterval: tickInterval
-                },
-                yAxis: {
-                    title: false,
-                    labels: {
-                        overflow: 'allow',
-                        formatter: function () {
-                            return '$' + Highcharts.numberFormat(this.value,0,'.',',');
-                        },
-                    },
-                    tickAmount: 5,
-                },
-                credits: {
-                    enabled: false
-                },
-                tooltip: {
-                    shadow: false,
-                    padding: 10,
-                    shared: true,
-                    valuePrefix: '$',
-                    valueDecimals: 2
-                },
-            })
-        }
-        
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            drawHighcharts();
-        } else {
-            document.addEventListener("DOMContentLoaded", drawHighcharts);
-        }
-
-      }
+      
     },
     mounted: function(){
         this.getResults()

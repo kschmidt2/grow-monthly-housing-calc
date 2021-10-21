@@ -8,7 +8,7 @@
   <title>Graphic preview</title>
 
   <!--build:css css/styles.min.css-->
-  <link rel="stylesheet" href="css/loan-calculator_styles.css">
+  <link rel="stylesheet" href="css/monthly-housing-calculator_styles.css">
   <!--endbuild-->
 
 </head>
@@ -18,37 +18,39 @@
 
   <div id="calculator">
 
-    <p class="calculator-label">Loan calculator</p>
+    <p class="calculator-label">Housing budget calculator</p>
 
     <div class="flex-container">
 
       <div class="input-area">
 
+
+        <div class="calc-input">
+          <label for="rentbuy">I am looking to:</label>
+          <div class="calc-input-radio">
+            <input type="radio" id="rent" name="rentbuy" v-model="rentbuy" value="rent" @click="isDisabled = true"></input>
+            <label for="rent">Rent</label>
+      
+            <input type="radio" id="buy" name="rentbuy" v-model="rentbuy" value="buy" @click="isDisabled = false"></input>
+            <label for="buy">Buy</label>
+          </div>
+        </div>
+
         <div class="calc-input money-input wrap">
-          <label for="amount">Loan amount</label>
-          <input type="text" name="amount" v-model="amount" maxlength="10" oninput="this.value=this.value.slice(0,this.maxLength)"></input>
+          <label for="income">Annual pre-tax income</label>
+          <input type="text" name="income" v-model="income" maxlength="10" oninput="this.value=this.value.slice(0,this.maxLength)"></input>
         </div>
 
         <div class="wrap">
-          <div class="calc-input">
-            <label for="term">Term</label>
-            <input type="number" name="term" v-model.number="term" maxlength="6"></input>
+          <div class="calc-input money-input"  v-bind:class="{disabledtext: isDisabled}">
+            <label for="debt">Monthly debt obligations</label>
+            <input type="text" name="debt" v-model="debt" maxlength="10" oninput="this.value=this.value.slice(0,this.maxLength)" :disabled="isDisabled"></input> 
           </div>
-      
-          <div class="calc-input-radio">
-            <input type="radio" id="annually" name="frequency" v-model="frequency" value="1"></input>
-            <label for="annually">Years</label>
-      
-            <input type="radio" id="monthly" name="frequency" v-model="frequency" value="12"></input>
-            <label for="monthly">Months</label>
-          </div>
+          <div class="input-explanation">
+            Include all non-housing debt payments: credit cards, auto loans, student loans, etc.
+          </div>   
         </div>
-    
-        <div class="calc-input percent-input ">
-          <label for="interest-rate">Annual interest rate</label>
-          <input type="number" name="interest-rate" v-model.number="interestRate" maxlength="5"></input>
-        </div>
-
+  
         <button v-on:click="getResults">Calculate</button>
 
       </div>
@@ -56,35 +58,32 @@
         
       <div class="results">
 
-        <table>
-          <tr>
-            <td class="label-text">Monthly payment</td>
-            <td class="value-text">${{monthlyPayment}}</td>
-          </tr>
-          <tr>
-            <td class="label-text">Payoff date</td>
-            <td class="value-text">{{payoffDate}}</td>
-          </tr>
-          <tr>
-            <td class="label-text">Total amount paid</td>
-            <td class="value-text">${{totalPaid}}</td>
-          </tr>
-          <tr>
-            <td class="label-text">Total interest paid</td>
-            <td class="value-text">${{totalInterest}}</td>
-          </tr>
-        </table>
-
-        <div class="chart-header">
-          {{headerString}}
+        <div v-if="showRentbuy=='rent'">
+          <p class="label-text">For renters</p>
+          <p>
+            Experts recommend keeping your housing expenses below <b>25%</b> or <b>30%</b> of your income.
+          </p>
+          <p>
+            25% of your monthly income is <span class="value-text">${{monthly25}}</span> and 30% of your monthly income is <span class="value-text">${{monthly30}}</span>.
+          </p>
+        </div>
+        <div v-if="showRentbuy=='buy'">
+          <p class="label-text">For buyers</p>
+          <p>
+            Experts recommend keeping your housing expenses below <b>25%</b> or <b>28%</b> of your income, and your total monthly debt obligations to <b>36%</b> of your income.
+          </p>
+          <p>
+            25% of your monthly income is <span class="value-text">${{monthly25}}</span> and 28% of your monthly income is <span class="value-text">${{monthly28}}</span>.
+          </p>
+          <p v-if="exceedMax==true">
+            To keep your monthly debt obligations under 36%, you can spend up to <span class="value-text">${{canPay}}</span>
+          </p>
+          <p v-if="exceedMax==false">
+            These values would keep your total monthly debts below 36% of your income.
+          </p>
         </div>
 
-        <div class="chart-container" id="chart-container-loancalc"></div>
-
-        <div class="alt-payments">
-          <p>If you increase your monthly payments by 10% to <span class="value-text">${{tenPayment}}</span>, you will save <span class="value-text">${{tenSave}}</span> in interest and pay off your loan by <span class="value-text">{{tenPayoff}}</span>.</p>
-          <p>If you increase your monthly payments by 25% to <span class="value-text">${{twentyfivePayment}}</span>, you will save <span class="value-text">${{twentyfiveSave}}</span> in interest and pay off your loan by <span class="value-text">{{twentyfivePayoff}}</span>.</p>
-        </div>
+        
 
         
       </div>
@@ -105,7 +104,7 @@
   <!-- <script src="https://code.highcharts.com/highcharts-more.js"></script> -->
   <!--build:js js/main.min.js -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
-  <script src="js/loan-calculator_main.js"></script>
+  <script src="js/monthly-housing-calculator_main.js"></script>
   <!-- endbuild -->
 </body>
 </html>

@@ -44,15 +44,16 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   max-width: 580px;
   margin-bottom: 25px;
   font-family: $font-stack;
-  font-size: 18px;
-  padding: 20px;
+  font-size: 16px;
+  padding: 20px 20px 0;
   background-color: $green-secondary-5;
   background-image: url(https://fm.cnbc.com/applications/cnbc.com/resources/files/2020/01/29/background-5.png);
-  background-position: left 75px;
+  background-position: left 100px;
   background-repeat: no-repeat;
   background-size: 620px;
   @include sm-md-xl(){
     padding: 20px 30px;
+    background-position: left 75px;
   }
 
   .flex-container {
@@ -79,7 +80,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
 
   .input-area {
     width: 100%;
-    // max-width: 240px;
+    max-width: 240px;
     // flex-shrink: 0;
     @include x-small {
       max-width: 350px;
@@ -106,7 +107,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
       color: $green-primary;
       font-weight: 600;
       padding: 5px 5px 5px 10px;
-      width: 140px;
+      width: 200px;
       @include x-small {
         width: 215px;
       }
@@ -116,7 +117,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
         content: '$';
         position: relative;
         top: -2px;
-        left: -150px;
+        left: -215px;
         height: 20px;
         width: 10px;
         z-index: 999;
@@ -127,8 +128,8 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
       }
       & input {
         padding-left: 20px;
-        width: 130px;
-        margin-right: 5px;
+        width: 170px;
+        margin-right: 25px;
         @include x-small {
           width: 205px;
         }
@@ -151,12 +152,8 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
   .calc-input-radio {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: -20px;
-    margin-top: -15px;
-    @include x-small {
-      margin-top: -15px;
-      margin-bottom: 20px;
-    }
+    margin-bottom: -5px;
+    margin-top: -5px;
     & input {
       position: absolute !important;
       clip: rect(0, 0, 0, 0);
@@ -188,15 +185,25 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
     }
   }
 
+  .input-explanation {
+    width: 200px;
+    margin-top: -15px;
+    font-size: 10px;
+    margin-bottom: -25px;
+    @include sm-md-xl(){
+      margin-bottom: -50px;
+    }
+  }
+
   .results {
     flex-grow: 1;
     background-color: white;
-    padding: 10px;
+    padding: 10px 20px;
     margin-top: 5px;
     margin-bottom: 20px;
     height: 80%;
-    min-height: 325px;
-    // max-width: 300px;
+    min-height: 366px;
+    max-width: 45%;
     @include x-x-small {
       max-width: 250px;
     }
@@ -205,48 +212,31 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
     }
     @include sm-md-xl() {
       // margin-left: -20px;
-      padding: 20px 20px 10px;
+      padding: 5px 18px;
     }
   }
 
   .label-text {
-    margin-block-start: 0;
+    // margin-block-start: 0;
     margin-block-end: 0;
     font-weight: 600;
     font-size: 16px;
-    margin-left: 10px;
+    text-transform: uppercase;
   }
 
   .value-text  {
     font-weight: 700;
     color: $green-primary;
-    padding-left: 5px;
     text-align: right;
     @include x-x-small {
       padding-left: 0px;
     }
   }
 
-  table {
-    width: 100%;
-    @include x-x-small() {
-      width: 240px;
-    }
-    margin: 0 auto;
-    & td {
-      // border-bottom: 1px solid $slate-secondary-4;
-      padding: 5px 0px 2px;
-    }
-  }
-
-  .alt-payments {
-    margin: 10px auto 0;
-    border-top: 1px solid $green-secondary-5;
-    // max-width: 290px;
-    padding: 0 5px;
-    font-size: 14px;
-    & .value-text {
-      padding: 0;
+  .disabledtext {
+    color: $green-secondary-5;
+    & input {
+      color: rgba(255,255,255,0);
     }
   }
 
@@ -300,7 +290,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
 
   button {
     margin-bottom: 15px;
-    margin-top: 10px;
+    margin-top: 70px;
     color: white;
     font-size: 16px;
     line-height: 1;
@@ -319,6 +309,7 @@ $font-stack: 'Avenir Next', 'Arial', sans-serif;
     }
     @include x-small {
       padding: 12px 16px 12px 16px;
+      margin-top: 40px;
     }
   }
 
